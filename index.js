@@ -521,6 +521,7 @@ function custlookup(email, dialogID, callback) {
 			sendPlainText(message, dialogID);
 		}
 	  });
+	return callback(result);
 	});
 }
 
