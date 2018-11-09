@@ -254,16 +254,10 @@ function processResponse(err, response, dialogID) {
 			////            Customer Lookup            ////
 			///////////////////////////////////////////////
 			if (response.output.action.name === "custlookup") {
-				custlookuper(fuction(result){
-					con.end();
-				});
-			}
-
-			function custlookuper(callback){
 				var email = response.output.action.email;
 				console.log('Email lookup: ' + email);
 				custlookup(email, dialogID);
-			}
+
 						
 
                         // If an escalate action is detected, transfer to the specified human skill.
