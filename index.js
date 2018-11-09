@@ -253,7 +253,7 @@ function processResponse(err, response, dialogID) {
 			///////////////////////////////////////////////
 			////            Customer Lookup            ////
 			///////////////////////////////////////////////
-			if (response.output.action.name) === "custlookup") {
+			if (response.output.action.name === "custlookup") {
 				custlookuper(fuction(result){
 					con.end();
 				});
