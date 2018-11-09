@@ -257,7 +257,7 @@ function processResponse(err, response, dialogID) {
 				var email = response.output.action.email;
 				console.log('Email lookup: ' + email);
 				custlookup(email, dialogID);
-
+			}
 						
 
                         // If an escalate action is detected, transfer to the specified human skill.
