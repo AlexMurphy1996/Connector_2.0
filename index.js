@@ -256,9 +256,7 @@ function processResponse(err, response, dialogID) {
 			if (response.output.action.name === "custlookup") {
 				var email = response.output.action.email;
 				console.log('Email lookup: ' + email);
-				custlookup(email, dialogID, fuction(result){
-					con.end();
-				});
+				custlookup(email, dialogID);
 			}
 						
 
@@ -521,7 +519,7 @@ function custlookup(email, dialogID, callback) {
 			sendPlainText(message, dialogID);
 		}
 	  });
-	return callback(result);
+	con.end;
 	});
 }
 
