@@ -253,12 +253,16 @@ function processResponse(err, response, dialogID) {
 			///////////////////////////////////////////////
 			////            Customer Lookup            ////
 			///////////////////////////////////////////////
-			if (response.output.action.name === "custlookup") {
-				var email = response.output.action.email;
-				console.log('Email lookup: ' + email);
-				custlookup(email, dialogID, fuction(result){
+			if (response.output.action.name) === "custlookup") {
+				custlookuper(fuction(result){
 					con.end();
 				});
+			}
+
+			function custlookuper(callback){
+				var email = response.output.action.email;
+				console.log('Email lookup: ' + email);
+				custlookup(email, dialogID);
 			}
 						
 
@@ -504,7 +508,7 @@ function transferConversation(skillId, dialogID) {
 
 }
 
-function custlookup(email, dialogID, callback) {
+function custlookup(email, dialogID) {
 
 	con.connect(function(err) {
 		if (err) throw err;
