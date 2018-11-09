@@ -253,7 +253,7 @@ function processResponse(err, response, dialogID) {
 			///////////////////////////////////////////////
 			////            Customer Lookup            ////
 			///////////////////////////////////////////////
-			if (response.output.action.name) === "custlookup") {
+			if (response.output.action.name === "custlookup") {
 				var email = response.output.action.email;
 				console.log('Email lookup: ' + email);
 				custlookup(email, dialogID, fuction(result){
