@@ -25,6 +25,20 @@ setInterval(function() {
 // End of heroku section.
 // ****************************************************************
 
+///////////////////////////////////////////////
+////         MySQL Connection Made         ////
+///////////////////////////////////////////////
+var mysql = require('mysql');
+
+var con = mysql.createConnection({
+	host: "localhost",
+	user: "id7603411_alexmurphy1996@2a02:4780:bad:c0de::14",
+	password: "vatesting",
+	database: "id7603411_test"
+});
+
+////////////////////////////////////////////////
+
 var watson = require('watson-developer-cloud');
 var messagingAgent = require('./messagingAgent');
 var request = require('request');
@@ -98,13 +112,13 @@ echoAgent.on('messagingAgent.ContentEvent', (contentEvent) => {
         if(greenlight){
             if(typeof contentEvent.message !== 'object'){ // Check to make sure that the message from the customer is plain text.
                 console.log("Sending message: " + contentEvent.message);
-                assistant.message({
-                    workspace_id: process.env.WCS_WORKSPACE_ID,
-                    input: {text: message},
-                    context : umsDialogToWatsonContext[contentEvent.dialogId]
-                }, (err, res) => {
-                    processResponse(err, res, contentEvent.dialogId);
-                });
+                assistant.message({											 /////
+                    workspace_id: process.env.WCS_WORKSPACE_ID,					//
+                    input: {text: message},										//
+                    context : umsDialogToWatsonContext[contentEvent.dialogId]	//////-- Sends message to Watson in Json format  	
+                }, (err, res) => {												//
+                    processResponse(err, res, contentEvent.dialogId);			//
+                });															 /////
                 greenlight = 0;
             }
             else { // If the message is not plain text (i.e. image or audio-clip) then handle appropriately.
@@ -136,17 +150,17 @@ function processResponse(err, response, dialogID) {
         // Initiate typing indicator prior to the bot response.
         startTyping(dialogID);
 
-        // If an intent is detected, log it out to the console.
+        // If an intent is detected, log it out to the console with confidence level.
         if (response.intents.length > 0) {
             console.log('Detected intent: #' + response.intents[0].intent + ' - with a confidence of: ' + response.intents[0].confidence);
         }
 
-        // If an entity is detected, log it out to the console.
+        // If an entity is detected, log it out to the console with confidence level.
         if (response.entities.length > 0) {
             console.log('Detected entity: @' + response.entities[0].entity + ' - with a confidence of: ' + response.entities[0].confidence);
         }
 
-        setTimeout(function() { // Set the timeout function to simulate a delay from Watson so we can show the typing indicator.
+        setTimeout(function() { // Set the time-out function to simulate a delay from Watson so we can show the typing indicator.
 
             for (var i = 0; i < response.output.text.length; i++) {
 
@@ -175,7 +189,7 @@ function processResponse(err, response, dialogID) {
                             if (response.output.endpoint.type === "abc") {
                                 metadata = response.output.endpoint.value;
                                 sendABCStructuredContent(answer, metadata, dialogID);
-                            // Else if structured content contains a QuickReply then send as QR Structured Content.
+                            // Else if structured content contains a QuickReply then send as QR Structured Content. (Quick Reply is options for customer in bubble form)
                             } else if (response.output.endpoint.type === "quickreplies") {
                                 metadata = response.output.endpoint.value;
                                 sendQRStructuredContent(answer, metadata, dialogID);
@@ -193,7 +207,7 @@ function processResponse(err, response, dialogID) {
 
                 }
 
-                // Else if line breaks in plain text messsage are detected, send as snippets.
+                // Else if line breaks in plain text message are detected, send as snippets.
                 else if (answer.includes('|')) {
 
                     console.log('Message format : Plain text with snippets');
@@ -222,7 +236,7 @@ function processResponse(err, response, dialogID) {
 
                 }
 
-                // Identify and then process any actions specified in the JSON response.
+                // Identify and then process any ACTIONS specified in the JSON response.
                 if (typeof response.output.action !== "undefined") {
                     if (typeof response.output.action.name !== "undefined") {
 
@@ -235,6 +249,18 @@ function processResponse(err, response, dialogID) {
                                 closeConversation(dialogID);
                             }, closedelay) // delay in milliseconds before closing the conversation.
                         }
+						
+						///////////////////////////////////////////////
+						////            Customer Lookup            ////
+						///////////////////////////////////////////////
+						if (response.output.action.name) === "custlookup") {
+							var email = response.output.action.email;
+							console.log('Email lookup: ' + email);
+							custlookup(email, dialogID, fuction(result){
+								con.end();
+							});
+						}
+						
 
                         // If an escalate action is detected, transfer to the specified human skill.
                         // If the transfer is requested during out-of-hours then set the right expectation with the customer.
@@ -253,17 +279,17 @@ function processResponse(err, response, dialogID) {
 
                             console.log('Opening hours  : ' + openHour + ':' + openMins + ' - ' + closeHour + ':' + closeMins);
 
-                            if (currentHour > openHour && currentHour < closeHour) {
-                                off_hours = false;
-                            } else if (currentHour == openHour) {
-                                if (currentMins >= openMins) {
-                                    off_hours = false;
-                                }
-                            } else if (currentHour == closeHour) {
-                                if (currentMins < closeMins) {
-                                    off_hours = false;
-                                }
-                            }
+                            if (currentHour > openHour && currentHour < closeHour) {  ////
+                                off_hours = false;										//
+                            } else if (currentHour == openHour) {						//
+                                if (currentMins >= openMins) {							//
+                                    off_hours = false;									//
+                                }														////// - Checks if it is off hours for CS or not
+                            } else if (currentHour == closeHour) {						//	
+                                if (currentMins < closeMins) {							//
+                                    off_hours = false;									//
+                                }														//
+                            }														  ////
 
                             if (off_hours) {
                                 console.log('Current time   : ' + currentHour + ':' + currentMins + ' - Out of hours detected, sending notification snippets...');
@@ -476,6 +502,26 @@ function transferConversation(skillId, dialogID) {
         }
     });
 
+}
+
+function custlookup(email, dialogID, callback) {
+
+	con.connect(function(err) {
+		if (err) throw err;
+		var query = "SELECT * FROM Customers WHERE Email = \'" + email + "\'";
+		con.query(query, function (err, result) {
+			if (err) throw err;
+			console.log(result);
+		if (result.length!= 0) {
+			var message = "found";
+			sendPlainText(message, dialogID);
+		}
+		else {
+			var message = "not found";
+			sendPlainText(message, dialogID);
+		}
+	  });
+	});
 }
 
 // This function retrieves the baseURI for the 'accountConfigReadWrite' service from the LiveEngage account.
