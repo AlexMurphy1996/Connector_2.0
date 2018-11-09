@@ -253,10 +253,12 @@ function processResponse(err, response, dialogID) {
 			///////////////////////////////////////////////
 			////            Customer Lookup            ////
 			///////////////////////////////////////////////
-			if (response.output.action.name === "custlookup") {
+			if (response.output.action.name) === "custlookup") {
 				var email = response.output.action.email;
 				console.log('Email lookup: ' + email);
-				custlookup(email, dialogID);
+				custlookup(email, dialogID, fuction(result){
+					con.end();
+				});
 			}
 						
 
@@ -504,7 +506,8 @@ function transferConversation(skillId, dialogID) {
 
 function custlookup(email, dialogID, callback) {
 
-	
+	con.connect(function(err) {
+		if (err) throw err;
 		var query = "SELECT * FROM Customers WHERE Email = \'" + email + "\'";
 		con.query(query, function (err, result) {
 			if (err) throw err;
@@ -518,6 +521,7 @@ function custlookup(email, dialogID, callback) {
 			sendPlainText(message, dialogID);
 		}
 	  });
+	});
 }
 
 // This function retrieves the baseURI for the 'accountConfigReadWrite' service from the LiveEngage account.
