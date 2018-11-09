@@ -256,7 +256,7 @@ function processResponse(err, response, dialogID) {
 			if (response.output.action.name === "custlookup") {
 				var email = response.output.action.email;
 				console.log('Email lookup: ' + email);
-				custlookup(email, dialogID, fuction(result)){
+				custlookup(email, dialogID, fuction(result){
 					con.end();
 				});
 			}
