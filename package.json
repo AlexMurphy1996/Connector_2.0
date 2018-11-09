@@ -11,6 +11,6 @@
     "dotenv": "^6.0.0",
     "node-agent-sdk": "^1.0.5",
     "watson-developer-cloud": "^3.11.1",
-    "mysql":"5.7.23"
+    "mysql":">=2.5.0"
   }
 }
