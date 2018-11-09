@@ -250,21 +250,21 @@ function processResponse(err, response, dialogID) {
                             }, closedelay) // delay in milliseconds before closing the conversation.
                         }
 						
-						///////////////////////////////////////////////
-						////            Customer Lookup            ////
-						///////////////////////////////////////////////
-						if (response.output.action.name) === "custlookup") {
-							var email = response.output.action.email;
-							console.log('Email lookup: ' + email);
-							custlookup(email, dialogID, fuction(result){
-								con.end();
-							});
-						}
+			///////////////////////////////////////////////
+			////            Customer Lookup            ////
+			///////////////////////////////////////////////
+			else if (response.output.action.name) === "custlookup") {
+				var email = response.output.action.email;
+				console.log('Email lookup: ' + email);
+				custlookup(email, dialogID, fuction(result){
+					con.end();
+				});
+			}
 						
 
                         // If an escalate action is detected, transfer to the specified human skill.
                         // If the transfer is requested during out-of-hours then set the right expectation with the customer.
-                        if (response.output.action.name === "escalate") {
+                        else if (response.output.action.name === "escalate") {
 
                             var currentDtTm = new Date();
                             var currentHour = currentDtTm.getHours();
