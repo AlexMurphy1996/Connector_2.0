@@ -518,7 +518,7 @@ function custlookup(email, dialogID, callback) {
 			sendPlainText(message, dialogID);
 		}
 	  });
-
+}
 
 // This function retrieves the baseURI for the 'accountConfigReadWrite' service from the LiveEngage account.
 function retrieveBaseURI() {
