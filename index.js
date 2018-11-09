@@ -30,7 +30,8 @@ setInterval(function() {
 ///////////////////////////////////////////////
 var mysql = require('mysql');
 
-var con = mysql.createConnection({
+var con = mysql.createPool({
+	connectionLimit: 10,
 	host: "localhost",
 	user: "id7603411_alexmurphy1996@2a02:4780:bad:c0de::14",
 	password: "vatesting",
@@ -504,10 +505,11 @@ function transferConversation(skillId, dialogID) {
 
 function custlookup(email, dialogID) {
 
-	con.connect(function(err) {
+	con.getConnection(function(err, connection) {
 		if (err) throw err;
 		var query = "SELECT * FROM Customers WHERE Email = \'" + email + "\'";
-		con.query(query, function (err, result) {
+		connection.query(query, function (err, result) {
+			connection.release();
 			if (err) throw err;
 			console.log(result);
 		if (result.length!= 0) {
