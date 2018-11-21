@@ -250,15 +250,48 @@ function processResponse(err, response, dialogID) {
                                 closeConversation(dialogID);
                             }, closedelay) // delay in milliseconds before closing the conversation.
                         }
+	
+			               ///////////////////////////////////////////////
+			               ////            Customer Lookup            ////
+			               ///////////////////////////////////////////////
+			               if (response.output.action.name === "custlookup") {
+				               var email = response.output.action.email;
+				               console.log('Email lookup: ' + email);
+				               custlookup(email, dialogID);
+				               return 5;
+			               }
 						
+                        ///////////////////////////////////////////////
+                        ////            DoB Lookup         	   ////
+                        ///////////////////////////////////////////////
+                        
+                        if (response.output.action.name === "doblookup") {
+	                        var email = response.output.action.email;
+	                        var answer = response.output.action.answer;
+	                        console.log('Date of Birth lookup: ' + answer);
+	                        doblookup(email, answer, dialogID);
+	                        return;
+                        } 
+
+                        ///////////////////////////////////////////////
+                        ////            SQ Lookup         	   ////
+                        ///////////////////////////////////////////////
+                        if (response.output.action.name === "SQlookup") {
+				               var email = response.output.action.email;
+				               console.log('Security Question lookup: ' + email);
+				               SQlookup(email, dialogID);
+				               return;
+			               
+			               
 			///////////////////////////////////////////////
-			////            Customer Lookup            ////
-			///////////////////////////////////////////////
-			if (response.output.action.name === "custlookup") {
-				var email = response.output.action.email;
-				console.log('Email lookup: ' + email);
-				custlookup(email, dialogID);
-			}
+                        ////             SA Lookup         	   ////
+                        ///////////////////////////////////////////////
+                        if (response.output.action.name === "SAlookup") {
+	                        var email = response.output.action.email;
+	                        var sanswer = response.output.action.sanswer;
+	                        console.log('Security Answer lookup for: ' + email);
+	                        SAlookup(email, sanswer, dialogID);
+                        }
 						
 
                         // If an escalate action is detected, transfer to the specified human skill.
@@ -503,6 +536,7 @@ function transferConversation(skillId, dialogID) {
 
 }
 
+
 function custlookup(email, dialogID) {
 
 	con.getConnection(function(err, connection) {
@@ -514,14 +548,99 @@ function custlookup(email, dialogID) {
 			console.log(result);
 		if (result.length!= 0) {
 			var message = "found";
-			sendPlainText(message, dialogID);
 		}
 		else {
 			var message = "not found";
-			sendPlainText(message, dialogID);
 		}
-	  });
-	});
+		var contentEvent = messagingAgent.ContentEvent;
+			      assistant.message({											 /////
+                          workspace_id: 'e1d4da47-544a-43b7-8f0c-80b11fd30912',					//
+                          input: {text: message},										//
+                          context : umsDialogToWatsonContext[dialogID]	//////-- Sends message to Watson in Json format  	
+                      }, (err, res) => {												//
+                          processResponse(err, res, dialogID);			//
+                      });
+      });
+   });
+}
+
+function doblookup(email, answer, dialogID, callback) {
+
+	con.getConnection(function(err, connection) {
+		if (err) throw err;
+		var query = "SELECT * FROM Customers WHERE DOB = \'" + answer + "\' AND EMAIL = '" + email+ "\'";
+		connection.query(query, function (err, result) {
+			if (err) throw err;
+			console.log(result);
+		if (result.length!= 0) {
+			var message = "found";
+		}
+		else {
+			var message = "not found";
+		}
+		var contentEvent = messagingAgent.ContentEvent;
+			      assistant.message({											 /////
+                          workspace_id: 'e1d4da47-544a-43b7-8f0c-80b11fd30912',					//
+                          input: {text: message},										//
+                          context : umsDialogToWatsonContext[dialogID]	//////-- Sends message to Watson in Json format  	
+                      }, (err, res) => {												//
+                          processResponse(err, res, dialogID);			//
+                      });
+      });
+   });
+}
+
+function SQlookup(email, dialogID) {
+
+   con.getConnection(function(err, connection) {
+      if (err) throw err;
+		var query = "SELECT SQ FROM Customers WHERE EMAIL = \'" + email+ "\'";
+		connection.query(query, function (err, result) {
+		   if (err) throw err;
+			   console.log(result[0]['SQ']);
+		   if (result.length!= 0) {
+			   var message = result[0]['SQ'];
+		   }
+		   else {
+			   var message = "not found";
+		   }
+		   var contentEvent = messagingAgent.ContentEvent;
+			      assistant.message({											 /////
+                          workspace_id: 'e1d4da47-544a-43b7-8f0c-80b11fd30912',					//
+                          input: {text: message},										//
+                          context : umsDialogToWatsonContext[dialogID]	//////-- Sends message to Watson in Json format  	
+                      }, (err, res) => {												//
+                          processResponse(err, res, dialogID);			//
+                      });
+     });
+   });
+}
+
+function SAlookup(email, sanswer, dialogID, callback) {
+
+   con.getConnection(function(err, connection) {
+		      if (err) throw err;
+		      var query = "SELECT SA FROM Customers WHERE EMAIL = \'" + email + "\' AND SA = \'" + sanswer + "\'";
+		      connection.query(query, function (err, result) {
+			      if (err) throw err;
+			      console.log(result[0]['SA']);
+		      if (result.length!= 0) {
+			      var message = "found";
+		      }
+		      else {
+			      var message = "not found";
+		      }
+		      var contentEvent = messagingAgent.ContentEvent;
+			      assistant.message({											 /////
+                          workspace_id: 'e1d4da47-544a-43b7-8f0c-80b11fd30912',					//
+                          input: {text: message},										//
+                          context : umsDialogToWatsonContext[dialogID]	//////-- Sends message to Watson in Json format  	
+                      }, (err, res) => {												//
+                          processResponse(err, res, dialogID);			//
+                      });
+		      connection.release();
+	   });
+   });
 }
 
 // This function retrieves the baseURI for the 'accountConfigReadWrite' service from the LiveEngage account.
