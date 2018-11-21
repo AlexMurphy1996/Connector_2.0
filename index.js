@@ -271,7 +271,13 @@ function processResponse(err, response, dialogID) {
 				SQlookup(email, dialogID);
 				return;
 			}    
-						
+			
+			if (response.output.action.name === "SAlookup") {
+	                        var email = response.output.action.email;
+	                        var sanswer = response.output.action.sanswer;
+	                        console.log('Security Answer lookup for: ' + email);
+	                        SAlookup(email, sanswer, dialogID);
+                        }
 
                         // If an escalate action is detected, transfer to the specified human skill.
                         // If the transfer is requested during out-of-hours then set the right expectation with the customer.
