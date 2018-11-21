@@ -265,6 +265,12 @@ function processResponse(err, response, dialogID) {
 	                        doblookup(email, answer, dialogID);
 	                        return;
                         }
+			if (response.output.action.name === "SQlookup") {
+				var email = response.output.action.email;
+				console.log('Security Question lookup: ' + email);
+				SQlookup(email, dialogID);
+				return;
+			}    
 						
 
                         // If an escalate action is detected, transfer to the specified human skill.
