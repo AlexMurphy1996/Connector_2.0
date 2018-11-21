@@ -32,7 +32,7 @@ var mysql = require('mysql');
 
 var con = mysql.createPool({
 	connectionLimit: 10,
-	host: "sql.freemysqlhosting.net",
+	host: "sql2.freemysqlhosting.net",
 	user: "sql2262915",
 	password: "bH3!qV3%",
 	database: "sql2262915"
