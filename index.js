@@ -251,46 +251,19 @@ function processResponse(err, response, dialogID) {
                             }, closedelay) // delay in milliseconds before closing the conversation.
                         }
 	
-			               ///////////////////////////////////////////////
-			               ////            Customer Lookup            ////
-			               ///////////////////////////////////////////////
-			               if (response.output.action.name === "custlookup") {
-				               var email = response.output.action.email;
-				               console.log('Email lookup: ' + email);
-				               custlookup(email, dialogID);
-				               return 5;
-			               }
-						
-                        ///////////////////////////////////////////////
-                        ////            DoB Lookup         	   ////
-                        ///////////////////////////////////////////////
-                        
-                        if (response.output.action.name === "doblookup") {
+			if (response.output.action.name === "custlookup") {
+				var email = response.output.action.email;
+				console.log('Email lookup: ' + email);
+				custlookup(email, dialogID);
+				return;
+			}
+			               
+			if (response.output.action.name === "doblookup") {
 	                        var email = response.output.action.email;
 	                        var answer = response.output.action.answer;
 	                        console.log('Date of Birth lookup: ' + answer);
 	                        doblookup(email, answer, dialogID);
 	                        return;
-                        } 
-
-                        ///////////////////////////////////////////////
-                        ////            SQ Lookup         	   ////
-                        ///////////////////////////////////////////////
-                        if (response.output.action.name === "SQlookup") {
-				               var email = response.output.action.email;
-				               console.log('Security Question lookup: ' + email);
-				               SQlookup(email, dialogID);
-				               return;
-			               
-			               
-			///////////////////////////////////////////////
-                        ////             SA Lookup         	   ////
-                        ///////////////////////////////////////////////
-                        if (response.output.action.name === "SAlookup") {
-	                        var email = response.output.action.email;
-	                        var sanswer = response.output.action.sanswer;
-	                        console.log('Security Answer lookup for: ' + email);
-	                        SAlookup(email, sanswer, dialogID);
                         }
 						
 
