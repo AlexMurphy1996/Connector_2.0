@@ -251,10 +251,17 @@ function processResponse(err, response, dialogID) {
                             }, closedelay) // delay in milliseconds before closing the conversation.
                         }
 	
-			if (response.output.action.name === "custlookup") {
+			if (response.output.action.name === "custlookupemail") {
 				var email = response.output.action.email;
 				console.log('Email lookup: ' + email);
 				custlookup(email, dialogID);
+				return;
+			}
+			    
+			if (response.output.action.name === "custlookupuser") {
+				var username = response.output.action.username;
+				console.log('Username lookup: ' + username);
+				custlookup(username, dialogID);
 				return;
 			}
 			               
@@ -522,11 +529,38 @@ function transferConversation(skillId, dialogID) {
 }
 
 
-function custlookup(email, dialogID) {
+function custlookupemail(email, dialogID) {
 
 	con.getConnection(function(err, connection) {
 		if (err) throw err;
 		var query = "SELECT * FROM Customers WHERE Email = \'" + email + "\'";
+		connection.query(query, function (err, result) {
+			connection.release();
+			if (err) throw err;
+			console.log(result);
+		if (result.length!= 0) {
+			var message = "found";
+		}
+		else {
+			var message = "not found";
+		}
+		var contentEvent = messagingAgent.ContentEvent;
+			      assistant.message({											 /////
+                          workspace_id: 'e1d4da47-544a-43b7-8f0c-80b11fd30912',					//
+                          input: {text: message},										//
+                          context : umsDialogToWatsonContext[dialogID]	//////-- Sends message to Watson in Json format  	
+                      }, (err, res) => {												//
+                          processResponse(err, res, dialogID);			//
+                      });
+      });
+   });
+}
+
+function custlookupuser(username, dialogID) {
+
+	con.getConnection(function(err, connection) {
+		if (err) throw err;
+		var query = "SELECT * FROM Customers WHERE Username = \'" + username + "\'";
 		connection.query(query, function (err, result) {
 			connection.release();
 			if (err) throw err;
