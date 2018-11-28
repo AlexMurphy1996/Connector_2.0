@@ -254,14 +254,14 @@ function processResponse(err, response, dialogID) {
 			if (response.output.action.name === "custlookupemail") {
 				var email = response.output.action.email;
 				console.log('Email lookup: ' + email);
-				custlookup(email, dialogID);
+				custlookupemail(email, dialogID);
 				return;
 			}
 			    
 			if (response.output.action.name === "custlookupuser") {
 				var username = response.output.action.username;
 				console.log('Username lookup: ' + username);
-				custlookup(username, dialogID);
+				custlookupuser(username, dialogID);
 				return;
 			}
 			               
