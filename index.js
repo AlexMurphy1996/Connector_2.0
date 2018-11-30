@@ -274,7 +274,7 @@ function processResponse(err, response, dialogID) {
                         }
 			    
 			if (response.output.action.name === "deepsearch") {
-			       	var name = response.output.action.name;
+			       	var name = response.output.action.fullname;
 	                       	var answer = response.output.action.answer;
 				console.log('Deep Search');
 				if(namesearch(name, dialogID)){
