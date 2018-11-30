@@ -285,6 +285,36 @@ function processResponse(err, response, dialogID) {
 	                        console.log('Security Answer lookup for: ' + email);
 	                        SAlookup(email, sanswer, dialogID);
                         }
+			    
+			if (response.output.action.name === "Pokerlookup") {
+			       var email = response.output.action.email;
+				    console.log('Poker wallet lookup for: ' + email);
+				    Pokerlookup(email, dialogID);
+				    return;
+			    }
+
+			 if (response.output.action.name === "Mainlookup") {
+			       var email = response.output.action.email;
+				    console.log('Poker wallet lookup for: ' + email);
+				    Mainlookup(email, dialogID);
+				    return;
+			    }
+
+			 if (response.output.action.name === "Exchangelookup") {
+			       var email = response.output.action.email;
+				    console.log('Exchange wallet lookup for: ' + email);
+				    Exchangelookup(email, dialogID);
+				    return;
+			    }
+
+			 if (response.output.action.name === "transfer_funds") {
+				 var email = response.output.action.email;	
+				 var amount = response.output.action.amount;
+				 var fromWallet = response.output.action.fromWallet;
+				 var toWallet = response.output.action.toWallet;
+				 console.log('Transfer funds: From:' + fromWallet + 'To:' + toWallet + 'Amount:' + amount);
+				 transfer_funds(email, amount, fromWallet, toWallet, dialogID);
+			 }
 
                         // If an escalate action is detected, transfer to the specified human skill.
                         // If the transfer is requested during out-of-hours then set the right expectation with the customer.
@@ -659,8 +689,106 @@ function SAlookup(email, sanswer, dialogID, callback) {
                       });
 		      connection.release();
 	   });
-   });
-}
+	});
+   }
+
+   function Pokerlookup(email, dialogID) {
+
+	   con.getConnection(function(err, connection) {
+		   if (err) throw err;
+		   console.log('lalala');
+		   var query = "SELECT pokerwallet FROM Customers WHERE EMAIL = \'alexmurphy1996@yahoo.ie\'";
+		   connection.query(query, function (err, result) {
+			   if (err) throw err;
+			   console.log(result[0]['pokerwallet']);
+		   if (result.length!= 0) {
+			   var message = result[0]['pokerwallet'];
+			   message = message.toString();
+		   }
+		   else {
+			   var message = "not found";
+		   }
+		   var contentEvent = messagingAgent.ContentEvent;
+			      assistant.message({											 /////
+                          workspace_id: 'e1d4da47-544a-43b7-8f0c-80b11fd30912',					//
+                          input: {text: message},										//
+                          context : umsDialogToWatsonContext[dialogID]	//////-- Sends message to Watson in Json format  	
+                      }, (err, res) => {												//
+                          processResponse(err, res, dialogID);			//
+                      });
+        connection.release();
+	     });
+	   });
+   }
+
+   function Mainlookup(email, dialogID) {
+
+	   con.getConnection(function(err, connection) {
+		   if (err) throw err;
+		   console.log('lalala');
+		   var query = "SELECT mainwallet FROM Customers WHERE EMAIL = \'alexmurphy1996@yahoo.ie\'";
+		   connection.query(query, function (err, result) {
+			   if (err) throw err;
+			   console.log(result[0]['mainwallet']);
+		   if (result.length!= 0) {
+			   var message = result[0]['mainwallet'];
+			   message = message.toString();
+		   }
+		   else {
+			   var message = "not found";
+		   }
+		   var contentEvent = messagingAgent.ContentEvent;
+			      assistant.message({											 /////
+                          workspace_id: 'e1d4da47-544a-43b7-8f0c-80b11fd30912',					//
+                          input: {text: message},										//
+                          context : umsDialogToWatsonContext[dialogID]	//////-- Sends message to Watson in Json format  	
+                      }, (err, res) => {												//
+                          processResponse(err, res, dialogID);			//
+                      });
+        connection.release();
+	     });
+	   });
+   }
+
+   function Exchangelookup(email, dialogID) {
+
+	   con.getConnection(function(err, connection) {
+		   if (err) throw err;
+		   console.log('lalala');
+		   var query = "SELECT exchangewallet FROM Customers WHERE EMAIL = \'alexmurphy1996@yahoo.ie\'";
+		   connection.query(query, function (err, result) {
+			   if (err) throw err;
+			   console.log(result[0]['exchangewallet']);
+		   if (result.length!= 0) {
+			   var message = result[0]['exchangewallet'];
+			   message = message.toString();
+		   }
+		   else {
+			   var message = "not found";
+		   }
+		   var contentEvent = messagingAgent.ContentEvent;
+			      assistant.message({											 /////
+                          workspace_id: 'e1d4da47-544a-43b7-8f0c-80b11fd30912',					//
+                          input: {text: message},										//
+                          context : umsDialogToWatsonContext[dialogID]	//////-- Sends message to Watson in Json format  	
+                      }, (err, res) => {												//
+                          processResponse(err, res, dialogID);			//
+                      });
+        connection.release();
+	     });
+	   });
+   }
+   
+   function transfer_funds(email, amount, fromWallet, toWallet, dialogID) {
+      con.getConnection(function(err, connection) {
+		   if (err) throw err;
+		   var query = "UPDATE Customers SET " + fromWallet + "wallet = " + fromWallet + "wallet - " + amount + ", " + toWallet + "wallet = " + toWallet + "wallet + " + amount + " WHERE Email = '" + email+ "'";
+		   connection.query(query, function (err, result) {
+			   if (err) throw err;
+			   console.log(result);
+			});
+      });
+   }
 
 // This function retrieves the baseURI for the 'accountConfigReadWrite' service from the LiveEngage account.
 function retrieveBaseURI() {
