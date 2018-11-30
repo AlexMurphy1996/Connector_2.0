@@ -277,8 +277,8 @@ function processResponse(err, response, dialogID) {
 			       	var name = response.output.action.name;
 	                       	var answer = response.output.action.answer;
 				console.log('Deep Search');
-				if(namesearch()){
-					doblookup();	
+				if(namesearch(name, dialogID)){
+					doblookup2(name, answer, dialogID);	
 				}
 				return;
 			    }
@@ -648,6 +648,32 @@ function doblookup(email, answer, dialogID, callback) {
 	con.getConnection(function(err, connection) {
 		if (err) throw err;
 		var query = "SELECT * FROM Customers WHERE DOB = \'" + answer + "\' AND EMAIL = '" + email+ "\'";
+		connection.query(query, function (err, result) {
+			if (err) throw err;
+			console.log(result);
+		if (result.length!= 0) {
+			var message = "found";
+		}
+		else {
+			var message = "not found";
+		}
+		var contentEvent = messagingAgent.ContentEvent;
+			      assistant.message({											 /////
+                          workspace_id: 'e1d4da47-544a-43b7-8f0c-80b11fd30912',					//
+                          input: {text: message},										//
+                          context : umsDialogToWatsonContext[dialogID]	//////-- Sends message to Watson in Json format  	
+                      }, (err, res) => {												//
+                          processResponse(err, res, dialogID);			//
+                      });
+      });
+   });
+}
+
+function doblookup2(name, answer, dialogID, callback) {
+
+	con.getConnection(function(err, connection) {
+		if (err) throw err;
+		var query = "SELECT * FROM Customers WHERE DOB = \'" + answer + "\' AND Name = '" + name + "\'";
 		connection.query(query, function (err, result) {
 			if (err) throw err;
 			console.log(result);
