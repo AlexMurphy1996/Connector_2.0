@@ -272,6 +272,17 @@ function processResponse(err, response, dialogID) {
 	                        doblookup(email, answer, dialogID);
 	                        return;
                         }
+			    
+			if (response.output.action.name === "deepsearch") {
+			       	var name = response.output.action.name;
+	                       	var answer = response.output.action.answer;
+				console.log('Deep Search');
+				if(namesearch()){
+					doblookup();	
+				}
+				return;
+			    }
+			    
 			if (response.output.action.name === "SQlookup") {
 				var email = response.output.action.email;
 				console.log('Security Question lookup: ' + email);
@@ -609,6 +620,25 @@ function custlookupuser(username, dialogID) {
                       }, (err, res) => {												//
                           processResponse(err, res, dialogID);			//
                       });
+      });
+   });
+}
+
+function namesearch(name, dialogID) {
+
+	con.getConnection(function(err, connection) {
+		if (err) throw err;
+		var query = "SELECT * FROM Customers WHERE Username = \'" + name + "\'";
+		connection.query(query, function (err, result) {
+			connection.release();
+			if (err) throw err;
+			console.log(result);
+		if (result.length!= 0) {
+			return true;
+		}
+		else {
+			var message = "not found";
+		}
       });
    });
 }
