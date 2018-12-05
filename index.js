@@ -275,13 +275,11 @@ function processResponse(err, response, dialogID) {
 			    
 			if (response.output.action.name === "deepsearch") {
 			       	var name = response.output.action.fullname;
-	                       	var answer = response.output.action.answer;
+	             		var answer = response.output.action.answer;
 				console.log('Deep Search');
-				if(namesearch(name, dialogID)){
-					doblookup2(name, answer, dialogID);	
-				}
+				namesearch(name, answer, dialogID)
 				return;
-			    }
+			} 
 			    
 			if (response.output.action.name === "SQlookup") {
 				var email = response.output.action.email;
@@ -624,30 +622,30 @@ function custlookupuser(username, dialogID) {
    });
 }
 
-function namesearch(name, dialogID) {
+function namesearch(name, answer, dialogID) {
 
 	con.getConnection(function(err, connection) {
 		if (err) throw err;
-		var query = "SELECT * FROM Customers WHERE Username = \'" + name + "\'";
+		var query = "SELECT * FROM Customers WHERE Name = \'" + name + "\'";
 		connection.query(query, function (err, result) {
 			connection.release();
 			if (err) throw err;
 			console.log(result);
 		if (result.length!= 0) {
-			return true;
+			return doblookup2(name, answer, dialogID);
 		}
 		else {
-			var message = "not found";
+			return false;
 		}
       });
    });
 }
 
-function doblookup(email, answer, dialogID, callback) {
+function doblookup2(name, answer, dialogID, callback) {
 
 	con.getConnection(function(err, connection) {
 		if (err) throw err;
-		var query = "SELECT * FROM Customers WHERE DOB = \'" + answer + "\' AND EMAIL = '" + email+ "\'";
+		var query = "SELECT * FROM Customers WHERE DOB = \'" + answer + "\' AND Name = '" + name + "\'";
 		connection.query(query, function (err, result) {
 			if (err) throw err;
 			console.log(result);
@@ -669,11 +667,11 @@ function doblookup(email, answer, dialogID, callback) {
    });
 }
 
-function doblookup2(name, answer, dialogID, callback) {
+function doblookup(email, answer, dialogID, callback) {
 
 	con.getConnection(function(err, connection) {
 		if (err) throw err;
-		var query = "SELECT * FROM Customers WHERE DOB = \'" + answer + "\' AND Name = '" + name + "\'";
+		var query = "SELECT * FROM Customers WHERE DOB = \'" + answer + "\' AND EMAIL = '" + email+ "\'";
 		connection.query(query, function (err, result) {
 			if (err) throw err;
 			console.log(result);
