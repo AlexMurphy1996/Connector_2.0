@@ -569,7 +569,8 @@ function transferConversation(skillId, dialogID) {
 }
 
 
-function custlookupemail(email, dialogID) {
+
+function custlookup(email, dialogID) {
 
 	con.getConnection(function(err, connection) {
 		if (err) throw err;
@@ -584,25 +585,54 @@ function custlookupemail(email, dialogID) {
 		else {
 			var message = "not found";
 		}
-		var contentEvent = messagingAgent.ContentEvent;
-			      assistant.message({											 /////
-                          workspace_id: 'e1d4da47-544a-43b7-8f0c-80b11fd30912',					//
-                          input: {text: message},										//
-                          context : umsDialogToWatsonContext[dialogID]	//////-- Sends message to Watson in Json format  	
-                      }, (err, res) => {												//
-                          processResponse(err, res, dialogID);			//
-                      });
+		actionsend(message, dialogID);
+		//connection.release();
       });
    });
+
 }
 
-function custlookupuser(username, dialogID) {
+
+function lookupemail(name, dialogID) {
 
 	con.getConnection(function(err, connection) {
 		if (err) throw err;
-		var query = "SELECT * FROM Customers WHERE Username = \'" + username + "\'";
+		var query = "SELECT * FROM Customers WHERE Name = \'" + name + "\'";
 		connection.query(query, function (err, result) {
 			connection.release();
+			if (err) throw err;
+			console.log(result[0]['Email']);
+		if (result.length!= 0) {
+			var message = result[0]['Email'];
+			console.log(message);
+		}
+		else {
+			var message = "not found";
+		}
+		actionsend(message, dialogID);
+      //connection.release();
+      });
+   });
+
+}
+
+function actionsend(message, dialogID) {
+   var contentEvent = messagingAgent.ContentEvent;
+   assistant.message({											 /////
+      workspace_id: 'e1d4da47-544a-43b7-8f0c-80b11fd30912',					//
+      input: {text: message},										//
+      context : umsDialogToWatsonContext[dialogID]	//////-- Sends message to Watson in Json format  	
+   }, (err, res) => {												//
+      processResponse(err, res, dialogID);			//
+   });
+}
+
+function doblookup(email, answer, dialogID, callback) {
+
+	con.getConnection(function(err, connection) {
+		if (err) throw err;
+		var query = "SELECT * FROM Customers WHERE DOB = \'" + answer + "\' AND EMAIL = '" + email+ "\'";
+		connection.query(query, function (err, result) {
 			if (err) throw err;
 			console.log(result);
 		if (result.length!= 0) {
@@ -611,14 +641,8 @@ function custlookupuser(username, dialogID) {
 		else {
 			var message = "not found";
 		}
-		var contentEvent = messagingAgent.ContentEvent;
-			      assistant.message({											 /////
-                          workspace_id: 'e1d4da47-544a-43b7-8f0c-80b11fd30912',					//
-                          input: {text: message},										//
-                          context : umsDialogToWatsonContext[dialogID]	//////-- Sends message to Watson in Json format  	
-                      }, (err, res) => {												//
-                          processResponse(err, res, dialogID);			//
-                      });
+		actionsend(message, dialogID);
+      connection.release();
       });
    });
 }
@@ -650,46 +674,14 @@ function doblookup2(name, answer, dialogID, callback) {
 		connection.query(query, function (err, result) {
 			if (err) throw err;
 			console.log(result);
-		if (result.length!= 0) {
-			var message = "found";
-		}
-		else {
-			var message = "not found";
-		}
-		var contentEvent = messagingAgent.ContentEvent;
-			      assistant.message({											 /////
-                          workspace_id: 'e1d4da47-544a-43b7-8f0c-80b11fd30912',					//
-                          input: {text: message},										//
-                          context : umsDialogToWatsonContext[dialogID]	//////-- Sends message to Watson in Json format  	
-                      }, (err, res) => {												//
-                          processResponse(err, res, dialogID);			//
-                      });
-      });
-   });
-}
-
-function doblookup(email, answer, dialogID, callback) {
-
-	con.getConnection(function(err, connection) {
-		if (err) throw err;
-		var query = "SELECT * FROM Customers WHERE DOB = \'" + answer + "\' AND EMAIL = '" + email+ "\'";
-		connection.query(query, function (err, result) {
-			if (err) throw err;
-			console.log(result);
-		if (result.length!= 0) {
-			var message = "found";
-		}
-		else {
-			var message = "not found";
-		}
-		var contentEvent = messagingAgent.ContentEvent;
-			      assistant.message({											 /////
-                          workspace_id: 'e1d4da47-544a-43b7-8f0c-80b11fd30912',					//
-                          input: {text: message},										//
-                          context : umsDialogToWatsonContext[dialogID]	//////-- Sends message to Watson in Json format  	
-                      }, (err, res) => {												//
-                          processResponse(err, res, dialogID);			//
-                      });
+		   if (result.length!= 0) {
+			   var message = "found";
+		   }
+		   else {
+			   var message = "not found";
+		   }
+		   actionsend(message, dialogID);
+		   connection.release();
       });
    });
 }
@@ -708,14 +700,8 @@ function SQlookup(email, dialogID) {
 		   else {
 			   var message = "not found";
 		   }
-		   var contentEvent = messagingAgent.ContentEvent;
-			      assistant.message({											 /////
-                          workspace_id: 'e1d4da47-544a-43b7-8f0c-80b11fd30912',					//
-                          input: {text: message},										//
-                          context : umsDialogToWatsonContext[dialogID]	//////-- Sends message to Watson in Json format  	
-                      }, (err, res) => {												//
-                          processResponse(err, res, dialogID);			//
-                      });
+		   actionsend(message, dialogID);
+     connection.release();
      });
    });
 }
@@ -727,25 +713,18 @@ function SAlookup(email, sanswer, dialogID, callback) {
 		      var query = "SELECT SA FROM Customers WHERE EMAIL = \'" + email + "\' AND SA = \'" + sanswer + "\'";
 		      connection.query(query, function (err, result) {
 			      if (err) throw err;
-			      console.log(result[0]['SA']);
 		      if (result.length!= 0) {
 			      var message = "found";
 		      }
 		      else {
 			      var message = "not found";
 		      }
-		      var contentEvent = messagingAgent.ContentEvent;
-			      assistant.message({											 /////
-                          workspace_id: 'e1d4da47-544a-43b7-8f0c-80b11fd30912',					//
-                          input: {text: message},										//
-                          context : umsDialogToWatsonContext[dialogID]	//////-- Sends message to Watson in Json format  	
-                      }, (err, res) => {												//
-                          processResponse(err, res, dialogID);			//
-                      });
+		      actionsend(message, dialogID);
 		      connection.release();
 	   });
-	});
-   }
+   });
+}
+
 
    function Pokerlookup(email, dialogID) {
 
@@ -763,14 +742,7 @@ function SAlookup(email, sanswer, dialogID, callback) {
 		   else {
 			   var message = "not found";
 		   }
-		   var contentEvent = messagingAgent.ContentEvent;
-			      assistant.message({											 /////
-                          workspace_id: 'e1d4da47-544a-43b7-8f0c-80b11fd30912',					//
-                          input: {text: message},										//
-                          context : umsDialogToWatsonContext[dialogID]	//////-- Sends message to Watson in Json format  	
-                      }, (err, res) => {												//
-                          processResponse(err, res, dialogID);			//
-                      });
+		   actionsend(message, dialogID);
         connection.release();
 	     });
 	   });
@@ -792,14 +764,7 @@ function SAlookup(email, sanswer, dialogID, callback) {
 		   else {
 			   var message = "not found";
 		   }
-		   var contentEvent = messagingAgent.ContentEvent;
-			      assistant.message({											 /////
-                          workspace_id: 'e1d4da47-544a-43b7-8f0c-80b11fd30912',					//
-                          input: {text: message},										//
-                          context : umsDialogToWatsonContext[dialogID]	//////-- Sends message to Watson in Json format  	
-                      }, (err, res) => {												//
-                          processResponse(err, res, dialogID);			//
-                      });
+		   actionsend(message, dialogID);
         connection.release();
 	     });
 	   });
@@ -821,14 +786,7 @@ function SAlookup(email, sanswer, dialogID, callback) {
 		   else {
 			   var message = "not found";
 		   }
-		   var contentEvent = messagingAgent.ContentEvent;
-			      assistant.message({											 /////
-                          workspace_id: 'e1d4da47-544a-43b7-8f0c-80b11fd30912',					//
-                          input: {text: message},										//
-                          context : umsDialogToWatsonContext[dialogID]	//////-- Sends message to Watson in Json format  	
-                      }, (err, res) => {												//
-                          processResponse(err, res, dialogID);			//
-                      });
+		   actionsend(message, dialogID);
         connection.release();
 	     });
 	   });
@@ -844,6 +802,7 @@ function SAlookup(email, sanswer, dialogID, callback) {
 			});
       });
    }
+
 
 // This function retrieves the baseURI for the 'accountConfigReadWrite' service from the LiveEngage account.
 function retrieveBaseURI() {
