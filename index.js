@@ -31,11 +31,11 @@ setInterval(function() {
 var mysql = require('mysql');
 
 var con = mysql.createPool({
-	connectionLimit: 10,
-	host: "sql2.freemysqlhosting.net",
-	user: "sql2262915",
-	password: "bH3!qV3%",
-	database: "sql2262915"
+   connectionLimit: 10,
+   host: "den1.mysql4.gear.host",
+   user: "ppbdb1",
+   password: "Yr4iF02-E25?",
+   database: "ppbdb1"
 });
 
 ////////////////////////////////////////////////
@@ -254,33 +254,33 @@ function processResponse(err, response, dialogID) {
 			if (response.output.action.name === "custlookupemail") {
 				var email = response.output.action.email;
 				console.log('Email lookup: ' + email);
-				custlookupemail(email, dialogID);
+				custlookup(email, dialogID);
 				return;
 			}
-			    
-			if (response.output.action.name === "custlookupuser") {
-				var username = response.output.action.username;
-				console.log('Username lookup: ' + username);
-				custlookupuser(username, dialogID);
+			
+			if (response.output.action.name === "lookupemail") {
+				var name = response.output.action.fullname;
+				console.log('Email lookup for: ' + name);
+				lookupemail(name, dialogID);
 				return;
 			}
 			               
 			if (response.output.action.name === "doblookup") {
 	                        var email = response.output.action.email;
 	                        var answer = response.output.action.answer;
-	                        console.log('Date of Birth lookup: ' + answer);
+	                        console.log('Date of Birth lookup: ' + answer + " " + email);
 	                        doblookup(email, answer, dialogID);
 	                        return;
                         }
-			    
-			if (response.output.action.name === "deepsearch") {
+                        
+         if (response.output.action.name === "deepsearch") {
 			       	var name = response.output.action.fullname;
-	             		var answer = response.output.action.answer;
+	             	var answer = response.output.action.answer;
 				console.log('Deep Search');
 				namesearch(name, answer, dialogID)
 				return;
-			} 
-			    
+			}      
+         
 			if (response.output.action.name === "SQlookup") {
 				var email = response.output.action.email;
 				console.log('Security Question lookup: ' + email);
@@ -293,37 +293,38 @@ function processResponse(err, response, dialogID) {
 	                        var sanswer = response.output.action.sanswer;
 	                        console.log('Security Answer lookup for: ' + email);
 	                        SAlookup(email, sanswer, dialogID);
+	                        return;
                         }
-			    
-			if (response.output.action.name === "Pokerlookup") {
-			       var email = response.output.action.email;
-				    console.log('Poker wallet lookup for: ' + email);
-				    Pokerlookup(email, dialogID);
-				    return;
-			    }
+                        
+         if (response.output.action.name === "Pokerlookup") {
+               var email = response.output.action.email;
+	            console.log('Poker wallet lookup for: ' + email);
+	            Pokerlookup(email, dialogID);
+	            return;
+            }
 
-			 if (response.output.action.name === "Mainlookup") {
-			       var email = response.output.action.email;
-				    console.log('Poker wallet lookup for: ' + email);
-				    Mainlookup(email, dialogID);
-				    return;
-			    }
+         if (response.output.action.name === "Mainlookup") {
+               var email = response.output.action.email;
+	            console.log('Poker wallet lookup for: ' + email);
+	            Mainlookup(email, dialogID);
+	            return;
+            }
 
-			 if (response.output.action.name === "Exchangelookup") {
-			       var email = response.output.action.email;
-				    console.log('Exchange wallet lookup for: ' + email);
-				    Exchangelookup(email, dialogID);
-				    return;
-			    }
-
-			 if (response.output.action.name === "transfer_funds") {
-				 var email = response.output.action.email;	
-				 var amount = response.output.action.amount;
-				 var fromWallet = response.output.action.fromWallet;
-				 var toWallet = response.output.action.toWallet;
-				 console.log('Transfer funds: From:' + fromWallet + 'To:' + toWallet + 'Amount:' + amount);
-				 transfer_funds(email, amount, fromWallet, toWallet, dialogID);
-			 }
+         if (response.output.action.name === "Exchangelookup") {
+               var email = response.output.action.email;
+	            console.log('Exchange wallet lookup for: ' + email);
+	            Exchangelookup(email, dialogID);
+	            return;
+            }
+            
+         if (response.output.action.name === "transfer_funds") {
+	         var email = response.output.action.email;	
+	         var amount = response.output.action.amount;
+	         var fromWallet = response.output.action.fromWallet;
+	         var toWallet = response.output.action.toWallet;
+	         console.log('Transfer funds: From:' + fromWallet + 'To:' + toWallet + 'Amount:' + amount);
+	         transfer_funds(email, amount, fromWallet, toWallet, dialogID);
+         }
 
                         // If an escalate action is detected, transfer to the specified human skill.
                         // If the transfer is requested during out-of-hours then set the right expectation with the customer.
